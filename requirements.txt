@@ -1,0 +1,17 @@
+langchain
+langchain-core
+langchain-community
+langchain-mistralai
+mistralai
+tavily-python
+beautifulsoup4
+requests
+python-dotenv
+pydantic
+aiohttp
+tiktoken
+langsmith
+streamlit
+lxml
+html5lib
+orjson
