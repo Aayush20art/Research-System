@@ -16,16 +16,17 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;700;800&family=JetBrains+Mono:wght@300;400;500&family=Inter:wght@300;400;500&display=swap');
 
 /* ── Keyframes ── */
-@keyframes bgDrift {
-    0%   { transform: scale(1)    rotate(0deg);   opacity: 1; }
-    33%  { transform: scale(1.08) rotate(1.5deg); opacity: 0.8; }
-    66%  { transform: scale(0.97) rotate(-1deg);  opacity: 0.9; }
-    100% { transform: scale(1)    rotate(0deg);   opacity: 1; }
+@keyframes bgShift {
+    0%   { background-position: 0% 0%; }
+    25%  { background-position: 100% 0%; }
+    50%  { background-position: 100% 100%; }
+    75%  { background-position: 0% 100%; }
+    100% { background-position: 0% 0%; }
 }
 @keyframes gradientFlow {
-    0%   { background-position: 0%   50%; }
+    0%   { background-position: 0% 50%; }
     50%  { background-position: 100% 50%; }
-    100% { background-position: 0%   50%; }
+    100% { background-position: 0% 50%; }
 }
 @keyframes orbitSpin {
     from { transform: rotate(0deg); }
@@ -36,10 +37,10 @@ st.markdown("""
     to   { transform: rotate(-360deg); }
 }
 @keyframes neuralPulse {
-    0%         { top: -5%;  opacity: 0; }
-    8%         { opacity: 1; }
-    92%        { opacity: 1; }
-    100%       { top: 105%; opacity: 0; }
+    0%   { top: -5%;  opacity: 0; }
+    8%   { opacity: 1; }
+    92%  { opacity: 1; }
+    100% { top: 105%; opacity: 0; }
 }
 @keyframes connectorGlow {
     0%, 100% { opacity: 0.3; }
@@ -47,28 +48,28 @@ st.markdown("""
 }
 @keyframes cardScan {
     0%   { left: -60%; }
-    100% { left: 120%; }
+    100% { left: 130%; }
 }
 @keyframes glowPulse {
     0%, 100% {
         box-shadow: 0 0 0 0 rgba(59,130,246,0);
-        border-color: rgba(59,130,246,0.45);
+        border-color: rgba(59,130,246,0.4);
     }
     50% {
-        box-shadow: 0 0 22px 3px rgba(59,130,246,0.18), inset 0 0 30px rgba(59,130,246,0.04);
-        border-color: rgba(59,130,246,0.9);
+        box-shadow: 0 0 24px 4px rgba(59,130,246,0.18), inset 0 0 20px rgba(59,130,246,0.04);
+        border-color: rgba(59,130,246,0.85);
     }
 }
 @keyframes emeraldGlow {
     0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
-    50%      { box-shadow: 0 0 16px 2px rgba(16,185,129,0.14); }
+    50%      { box-shadow: 0 0 18px 3px rgba(16,185,129,0.15); }
 }
 @keyframes shimmerBtn {
     0%   { transform: translateX(-120%) skewX(-20deg); }
-    100% { transform: translateX(220%)  skewX(-20deg); }
+    100% { transform: translateX(240%)  skewX(-20deg); }
 }
 @keyframes fadeSlideUp {
-    from { opacity: 0; transform: translateY(18px); }
+    from { opacity: 0; transform: translateY(16px); }
     to   { opacity: 1; transform: translateY(0); }
 }
 @keyframes stepNumGlow {
@@ -80,20 +81,10 @@ st.markdown("""
     60%  { opacity: 1; transform: scale(1.03); }
     100% { opacity: 1; transform: scale(1); }
 }
-@keyframes dotPulse1 { 0%,80%,100%{opacity:.2;transform:scaleY(.6)} 40%{opacity:1;transform:scaleY(1)} }
-@keyframes dotPulse2 { 0%,80%,100%{opacity:.2;transform:scaleY(.6)} 40%{opacity:1;transform:scaleY(1)} }
-@keyframes dotPulse3 { 0%,80%,100%{opacity:.2;transform:scaleY(.6)} 40%{opacity:1;transform:scaleY(1)} }
-@keyframes borderTrace {
-    0%   { background-position: 0%   0%; }
-    100% { background-position: 200% 0%; }
-}
-@keyframes floatUp {
-    0%,100% { transform: translateY(0); }
-    50%     { transform: translateY(-6px); }
-}
-@keyframes rippleOut {
-    0%   { transform: scale(0.85); opacity: 0.6; }
-    100% { transform: scale(2.2);  opacity: 0; }
+@keyframes topBarFlow {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 /* ── Reset & base ── */
@@ -102,75 +93,62 @@ html, body, [class*="css"] {
     color: #e2e8f0;
 }
 
+/* ── Animated background on stApp directly (no fixed overlay) ── */
 .stApp {
-    background: #060a14;
-    position: relative;
-    overflow-x: hidden;
+    background: #060a14 !important;
+    background-image:
+        radial-gradient(ellipse 70% 55% at 15% 20%, rgba(59,130,246,0.11) 0%, transparent 60%),
+        radial-gradient(ellipse 55% 45% at 85% 80%, rgba(139,92,246,0.09) 0%, transparent 55%),
+        radial-gradient(ellipse 40% 50% at 55% 50%, rgba(16,185,129,0.04) 0%, transparent 55%) !important;
+    background-size: 400% 400% !important;
+    animation: bgShift 30s ease infinite !important;
 }
 
-/* ── Animated background layer ── */
-.bg-layer {
+/* Grid overlay via a pseudo on the main content wrapper */
+[data-testid="stAppViewContainer"] {
+    background: none !important;
+}
+[data-testid="stAppViewContainer"]::before {
+    content: '';
     position: fixed;
     inset: 0;
+    background-image:
+        linear-gradient(rgba(59,130,246,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,0.025) 1px, transparent 1px);
+    background-size: 60px 60px;
     pointer-events: none;
     z-index: 0;
-    overflow: hidden;
-}
-.bg-orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-}
-.bg-orb-1 {
-    width: 700px; height: 700px;
-    top: -200px; left: -150px;
-    background: radial-gradient(circle, rgba(59,130,246,0.14) 0%, transparent 70%);
-    animation: bgDrift 18s ease-in-out infinite;
-}
-.bg-orb-2 {
-    width: 600px; height: 600px;
-    bottom: -200px; right: -100px;
-    background: radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%);
-    animation: bgDrift 22s ease-in-out infinite reverse;
-}
-.bg-orb-3 {
-    width: 400px; height: 400px;
-    top: 40%; left: 50%;
-    transform: translate(-50%,-50%);
-    background: radial-gradient(circle, rgba(16,185,129,0.05) 0%, transparent 70%);
-    animation: bgDrift 28s ease-in-out infinite 4s;
-}
-.bg-grid {
-    position: absolute;
-    inset: 0;
-    background-image:
-        linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
-    background-size: 60px 60px;
-    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
 }
 
 /* ── Hide default Streamlit chrome ── */
 #MainMenu, footer, header { visibility: hidden; }
-.block-container { padding: 2rem 3.5rem 5rem; max-width: 1280px; }
+.block-container {
+    padding: 2rem 3.5rem 5rem;
+    max-width: 1280px;
+    position: relative;
+    z-index: 1;
+}
 
 /* ── Hero ── */
 .hero {
     text-align: center;
     padding: 4rem 0 3rem;
     position: relative;
+    z-index: 2;
 }
-.hero-orbit-ring {
+.hero-orbit-wrap {
     position: absolute;
     left: 50%; top: 50%;
     transform: translate(-50%, -50%);
     pointer-events: none;
+    z-index: 0;
 }
 .orbit-ring-1 {
-    width: 340px; height: 340px;
-    border: 1px dashed rgba(59,130,246,0.12);
+    width: 360px; height: 360px;
+    border: 1px dashed rgba(59,130,246,0.13);
     border-radius: 50%;
-    animation: orbitSpin 40s linear infinite;
+    animation: orbitSpin 45s linear infinite;
+    position: relative;
 }
 .orbit-ring-2 {
     position: absolute;
@@ -178,21 +156,22 @@ html, body, [class*="css"] {
     border: 1px dashed rgba(139,92,246,0.10);
     border-radius: 50%;
     top: 50%; left: 50%;
-    transform: translate(-50%,-50%);
-    animation: orbitSpinRev 30s linear infinite;
+    transform: translate(-50%, -50%);
+    animation: orbitSpinRev 32s linear infinite;
 }
 .orbit-dot {
     position: absolute;
-    width: 5px; height: 5px;
+    width: 6px; height: 6px;
     border-radius: 50%;
-    top: 0; left: 50%;
-    transform: translate(-50%, -50%);
+    top: -3px; left: 50%;
+    transform: translateX(-50%);
     background: #3b82f6;
-    box-shadow: 0 0 8px 2px rgba(59,130,246,0.7);
+    box-shadow: 0 0 10px 3px rgba(59,130,246,0.8);
 }
-.orbit-dot-2 {
+.orbit-dot-v {
+    top: auto; bottom: -3px;
     background: #8b5cf6;
-    box-shadow: 0 0 8px 2px rgba(139,92,246,0.7);
+    box-shadow: 0 0 10px 3px rgba(139,92,246,0.8);
 }
 .hero-eyebrow {
     font-family: 'JetBrains Mono', monospace;
@@ -204,20 +183,22 @@ html, body, [class*="css"] {
     margin-bottom: 1.2rem;
     opacity: 0.85;
     position: relative;
+    z-index: 1;
 }
 .hero-eyebrow::before, .hero-eyebrow::after {
     content: '—';
-    margin: 0 0.6rem;
-    opacity: 0.4;
+    margin: 0 0.7rem;
+    opacity: 0.35;
 }
 .hero h1 {
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: clamp(3rem, 7vw, 5.5rem);
     font-weight: 800;
-    line-height: 0.95;
+    line-height: 0.93;
     letter-spacing: -0.04em;
-    margin: 0 0 1.2rem;
+    margin: 0 0 1.3rem;
     position: relative;
+    z-index: 1;
 }
 .hero-word-research {
     display: block;
@@ -225,7 +206,7 @@ html, body, [class*="css"] {
 }
 .hero-word-mind {
     display: block;
-    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 45%, #06b6d4 100%);
     background-size: 200% 200%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -237,10 +218,11 @@ html, body, [class*="css"] {
     font-size: 1rem;
     font-weight: 300;
     color: #64748b;
-    max-width: 500px;
+    max-width: 490px;
     margin: 0 auto;
     line-height: 1.75;
-    letter-spacing: 0.01em;
+    position: relative;
+    z-index: 1;
 }
 
 /* ── Divider ── */
@@ -248,8 +230,8 @@ html, body, [class*="css"] {
     height: 1px;
     background: linear-gradient(90deg,
         transparent,
-        rgba(59,130,246,0.25) 30%,
-        rgba(139,92,246,0.25) 70%,
+        rgba(59,130,246,0.22) 30%,
+        rgba(139,92,246,0.22) 70%,
         transparent
     );
     margin: 2.5rem 0;
@@ -260,60 +242,57 @@ html, body, [class*="css"] {
     position: absolute;
     left: 50%; top: 50%;
     transform: translate(-50%, -50%);
-    color: rgba(59,130,246,0.4);
-    font-size: 0.45rem;
+    color: rgba(59,130,246,0.45);
+    font-size: 0.42rem;
     background: #060a14;
-    padding: 0 6px;
+    padding: 0 8px;
 }
 
 /* ── Input card ── */
 .input-card {
-    background: rgba(12,18,32,0.9);
+    background: rgba(12,18,32,0.92);
     border: 1px solid rgba(59,130,246,0.14);
     border-radius: 20px;
-    padding: 2.2rem 2.5rem;
-    margin-bottom: 1.5rem;
-    backdrop-filter: blur(12px);
-    box-shadow:
-        0 0 0 1px rgba(59,130,246,0.04) inset,
-        0 20px 60px rgba(0,0,0,0.4);
-    transition: border-color 0.3s;
+    padding: 2rem 2.4rem;
+    margin-bottom: 1.2rem;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    transition: border-color 0.35s;
 }
 .input-card:hover {
-    border-color: rgba(59,130,246,0.25);
+    border-color: rgba(59,130,246,0.28);
 }
 
-/* ── Streamlit input overrides ── */
+/* ── Streamlit text input ── */
 .stTextInput > div > div > input {
-    background: rgba(6,10,20,0.8) !important;
-    border: 1px solid rgba(59,130,246,0.2) !important;
+    background: rgba(6,10,20,0.9) !important;
+    border: 1px solid rgba(59,130,246,0.18) !important;
     border-radius: 12px !important;
     color: #e2e8f0 !important;
     font-family: 'Inter', sans-serif !important;
-    font-size: 0.97rem !important;
-    padding: 0.8rem 1.1rem !important;
+    font-size: 0.96rem !important;
+    padding: 0.78rem 1.1rem !important;
     transition: border-color 0.25s, box-shadow 0.25s !important;
-    letter-spacing: 0.01em !important;
 }
 .stTextInput > div > div > input::placeholder {
-    color: #334155 !important;
+    color: #2d3d55 !important;
 }
 .stTextInput > div > div > input:focus {
     border-color: #3b82f6 !important;
-    box-shadow: 0 0 0 3px rgba(59,130,246,0.10), 0 0 20px rgba(59,130,246,0.08) !important;
-    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.10) !important;
 }
 .stTextInput > label {
     font-family: 'JetBrains Mono', monospace !important;
-    font-size: 0.68rem !important;
+    font-size: 0.67rem !important;
     letter-spacing: 0.2em !important;
     text-transform: uppercase !important;
     color: #3b82f6 !important;
     font-weight: 500 !important;
-    margin-bottom: 0.5rem !important;
+    margin-bottom: 0.45rem !important;
 }
 
-/* ── Button ── */
+/* ── Run button ── */
 .stButton > button {
     position: relative !important;
     overflow: hidden !important;
@@ -321,44 +300,42 @@ html, body, [class*="css"] {
     color: #fff !important;
     font-family: 'Plus Jakarta Sans', sans-serif !important;
     font-weight: 700 !important;
-    font-size: 0.9rem !important;
-    letter-spacing: 0.06em !important;
+    font-size: 0.88rem !important;
+    letter-spacing: 0.07em !important;
     border: none !important;
     border-radius: 12px !important;
-    padding: 0.75rem 2rem !important;
-    cursor: pointer !important;
+    padding: 0.72rem 2rem !important;
     transition: transform 0.18s, box-shadow 0.18s !important;
-    box-shadow: 0 4px 24px rgba(59,130,246,0.35), 0 0 0 1px rgba(255,255,255,0.08) inset !important;
+    box-shadow: 0 4px 24px rgba(59,130,246,0.3) !important;
     width: 100% !important;
     text-transform: uppercase !important;
 }
-.stButton > button::before {
+.stButton > button::after {
     content: '' !important;
     position: absolute !important;
-    top: 0 !important; bottom: 0 !important;
-    left: 0 !important;
-    width: 50% !important;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent) !important;
-    animation: shimmerBtn 2.8s ease-in-out infinite !important;
+    top: 0 !important; bottom: 0 !important; left: 0 !important;
+    width: 45% !important;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.13), transparent) !important;
+    animation: shimmerBtn 2.6s ease-in-out infinite !important;
     pointer-events: none !important;
 }
 .stButton > button:hover {
     transform: translateY(-2px) !important;
-    box-shadow: 0 8px 32px rgba(59,130,246,0.45), 0 0 0 1px rgba(255,255,255,0.12) inset !important;
+    box-shadow: 0 8px 30px rgba(59,130,246,0.4) !important;
 }
 .stButton > button:active {
-    transform: translateY(0) scale(0.99) !important;
+    transform: translateY(0) !important;
 }
 
 /* ── Section heading ── */
 .section-heading {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.24em;
     text-transform: uppercase;
     color: #475569;
-    margin: 0 0 1.2rem;
+    margin: 0 0 1.1rem;
     display: flex;
     align-items: center;
     gap: 0.6rem;
@@ -367,74 +344,74 @@ html, body, [class*="css"] {
     content: '';
     flex: 1;
     height: 1px;
-    background: linear-gradient(90deg, rgba(71,85,105,0.4), transparent);
+    background: linear-gradient(90deg, rgba(71,85,105,0.35), transparent);
 }
 
-/* ── Pipeline step cards ── */
+/* ── Step cards ── */
 .step-card {
-    background: rgba(12,18,32,0.85);
-    border: 1px solid rgba(255,255,255,0.055);
-    border-radius: 16px;
-    padding: 1.35rem 1.6rem;
+    background: rgba(11,17,30,0.88);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 1.3rem 1.55rem;
     position: relative;
     overflow: hidden;
-    backdrop-filter: blur(8px);
-    transition: border-color 0.4s, background 0.4s;
+    transition: border-color 0.4s, background 0.4s, box-shadow 0.4s;
 }
 .step-card.state-running {
-    border-color: rgba(59,130,246,0.45);
-    background: rgba(12,18,32,0.95);
+    border-color: rgba(59,130,246,0.42);
+    background: rgba(11,17,30,0.96);
     animation: glowPulse 2.2s ease-in-out infinite;
 }
 .step-card.state-done {
-    border-color: rgba(16,185,129,0.3);
-    background: rgba(12,18,32,0.85);
-    animation: emeraldGlow 3s ease-in-out infinite;
+    border-color: rgba(16,185,129,0.28);
+    animation: emeraldGlow 3.2s ease-in-out infinite;
 }
 
-/* Left accent bar */
+/* Left accent */
 .step-card::before {
     content: '';
     position: absolute;
     left: 0; top: 0; bottom: 0;
     width: 3px;
-    border-radius: 16px 0 0 16px;
-    transition: background 0.4s;
+    border-radius: 14px 0 0 14px;
+    transition: background 0.4s, box-shadow 0.4s;
 }
-.step-card.state-waiting::before { background: rgba(255,255,255,0.05); }
+.step-card.state-waiting::before { background: rgba(255,255,255,0.04); }
 .step-card.state-running::before {
     background: linear-gradient(180deg, #3b82f6, #8b5cf6);
-    box-shadow: 0 0 12px rgba(59,130,246,0.6);
+    box-shadow: 0 0 10px rgba(59,130,246,0.7);
 }
 .step-card.state-done::before {
     background: linear-gradient(180deg, #10b981, #059669);
-    box-shadow: 0 0 8px rgba(16,185,129,0.5);
+    box-shadow: 0 0 8px rgba(16,185,129,0.6);
 }
 
-/* Scan light on active */
-.step-card.state-running::after {
-    content: '';
+/* Scan sweep on running card */
+.step-card.state-running .step-scan {
+    display: block;
     position: absolute;
     top: 0; bottom: 0;
-    width: 40%;
+    width: 38%;
     background: linear-gradient(90deg, transparent, rgba(59,130,246,0.06), transparent);
     animation: cardScan 2.4s ease-in-out infinite;
     pointer-events: none;
 }
+.step-scan { display: none; }
 
 .step-header {
     display: flex;
     align-items: center;
-    gap: 0.9rem;
+    gap: 0.85rem;
 }
 .step-num {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.68rem;
+    font-size: 0.67rem;
     font-weight: 500;
     letter-spacing: 0.12em;
     color: #3b82f6;
-    opacity: 0.65;
+    opacity: 0.6;
     transition: opacity 0.3s;
+    flex-shrink: 0;
 }
 .step-card.state-running .step-num {
     opacity: 1;
@@ -447,10 +424,9 @@ html, body, [class*="css"] {
 }
 .step-title {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     font-weight: 700;
-    color: #cbd5e1;
-    letter-spacing: 0.01em;
+    color: #94a3b8;
     transition: color 0.3s;
 }
 .step-card.state-running .step-title { color: #e2e8f0; }
@@ -458,21 +434,22 @@ html, body, [class*="css"] {
 .step-status {
     margin-left: auto;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.64rem;
-    letter-spacing: 0.12em;
-    padding: 0.2rem 0.55rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    padding: 0.18rem 0.52rem;
     border-radius: 6px;
     font-weight: 500;
+    flex-shrink: 0;
 }
 .status-waiting {
-    color: #334155;
-    background: rgba(51,65,85,0.2);
-    border: 1px solid rgba(51,65,85,0.3);
+    color: #2d3d55;
+    background: rgba(30,40,60,0.5);
+    border: 1px solid rgba(45,61,85,0.5);
 }
 .status-running {
     color: #93c5fd;
     background: rgba(59,130,246,0.12);
-    border: 1px solid rgba(59,130,246,0.3);
+    border: 1px solid rgba(59,130,246,0.28);
 }
 .status-done {
     color: #6ee7b7;
@@ -481,25 +458,23 @@ html, body, [class*="css"] {
     animation: doneFlash 0.5s ease-out;
 }
 .step-desc {
-    font-size: 0.78rem;
-    color: #334155;
-    margin-top: 0.45rem;
-    padding-left: calc(0.68rem + 0.9rem + 16px);
+    font-size: 0.76rem;
+    color: #2d3d55;
+    margin-top: 0.42rem;
     font-family: 'Inter', sans-serif;
-    letter-spacing: 0.01em;
     transition: color 0.3s;
+    padding-left: calc(0.67rem + 0.85rem + 6px);
 }
 .step-card.state-running .step-desc { color: #475569; }
-.step-card.state-done   .step-desc { color: #4b5563; }
+.step-card.state-done   .step-desc { color: #374151; }
 
 /* ── Neural connector ── */
 .neural-connector {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 28px;
+    height: 26px;
     position: relative;
-    margin: 0;
 }
 .connector-track {
     position: absolute;
@@ -512,10 +487,10 @@ html, body, [class*="css"] {
     transition: background 0.5s;
 }
 .neural-connector.nc-done .connector-track {
-    background: linear-gradient(180deg, rgba(16,185,129,0.45), rgba(16,185,129,0.15));
+    background: linear-gradient(180deg, rgba(16,185,129,0.5), rgba(16,185,129,0.15));
 }
 .neural-connector.nc-active .connector-track {
-    background: linear-gradient(180deg, rgba(59,130,246,0.3), rgba(139,92,246,0.3));
+    background: linear-gradient(180deg, rgba(59,130,246,0.35), rgba(139,92,246,0.25));
     animation: connectorGlow 1.8s ease-in-out infinite;
 }
 .connector-pulse {
@@ -525,64 +500,62 @@ html, body, [class*="css"] {
     width: 7px; height: 7px;
     border-radius: 50%;
     transform: translateX(-50%);
-    background: radial-gradient(circle, #60a5fa, #3b82f6);
-    box-shadow: 0 0 12px 3px rgba(59,130,246,0.7);
-    animation: neuralPulse 1.6s linear infinite;
+    background: radial-gradient(circle, #93c5fd, #3b82f6);
+    box-shadow: 0 0 12px 4px rgba(59,130,246,0.75);
+    animation: neuralPulse 1.5s linear infinite;
     display: none;
 }
 .neural-connector.nc-active .connector-pulse { display: block; }
 
-/* ── Example tags ── */
+/* ── Example chips ── */
 .example-row {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.45rem;
     flex-wrap: wrap;
     margin-top: 1rem;
 }
 .example-label {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.64rem;
-    color: #334155;
+    font-size: 0.62rem;
+    color: #2d3d55;
     letter-spacing: 0.18em;
     text-transform: uppercase;
 }
 .example-chip {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.055);
     border-radius: 8px;
-    padding: 0.22rem 0.65rem;
-    font-size: 0.74rem;
-    color: #475569;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.73rem;
+    color: #3d5270;
     font-family: 'Inter', sans-serif;
-    letter-spacing: 0.01em;
-    cursor: default;
     transition: border-color 0.2s, color 0.2s;
+    cursor: default;
 }
 .example-chip:hover {
-    border-color: rgba(59,130,246,0.25);
-    color: #94a3b8;
+    border-color: rgba(59,130,246,0.28);
+    color: #64748b;
 }
 
 /* ── Result panels ── */
 .result-panel {
-    background: rgba(12,18,32,0.85);
-    border: 1px solid rgba(255,255,255,0.055);
-    border-radius: 16px;
-    padding: 1.6rem 1.8rem;
-    margin-bottom: 1rem;
+    background: rgba(11,17,30,0.88);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 1.5rem 1.7rem;
+    margin-bottom: 0.8rem;
     animation: fadeSlideUp 0.5s ease-out;
-    backdrop-filter: blur(8px);
 }
 .result-panel-label {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem;
+    font-size: 0.64rem;
     font-weight: 500;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
     color: #3b82f6;
-    margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
+    margin-bottom: 0.9rem;
+    padding-bottom: 0.7rem;
     border-bottom: 1px solid rgba(59,130,246,0.1);
     display: flex;
     align-items: center;
@@ -591,28 +564,28 @@ html, body, [class*="css"] {
 .result-panel-label::before {
     content: '';
     display: inline-block;
-    width: 6px; height: 6px;
+    width: 5px; height: 5px;
     border-radius: 50%;
     background: #3b82f6;
     box-shadow: 0 0 6px rgba(59,130,246,0.8);
+    flex-shrink: 0;
 }
 .result-content {
-    font-size: 0.88rem;
+    font-size: 0.87rem;
     line-height: 1.85;
-    color: #64748b;
+    color: #4b5d78;
     white-space: pre-wrap;
     font-family: 'Inter', sans-serif;
 }
 
 /* ── Report panel ── */
 .report-panel {
-    background: rgba(12,18,32,0.90);
-    border: 1px solid rgba(59,130,246,0.18);
+    background: rgba(11,17,30,0.92);
+    border: 1px solid rgba(59,130,246,0.16);
     border-radius: 18px;
-    padding: 2.2rem 2.5rem;
+    padding: 2rem 2.4rem;
     margin-top: 1rem;
-    animation: fadeSlideUp 0.6s ease-out;
-    box-shadow: 0 0 0 1px rgba(59,130,246,0.05) inset;
+    animation: fadeSlideUp 0.55s ease-out;
     position: relative;
     overflow: hidden;
 }
@@ -621,54 +594,56 @@ html, body, [class*="css"] {
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 3px;
-    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4, #3b82f6);
     background-size: 200% 100%;
-    animation: gradientFlow 4s ease infinite;
+    animation: topBarFlow 4s linear infinite;
 }
 .panel-label {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem;
-    letter-spacing: 0.22em;
+    font-size: 0.64rem;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
-    margin-bottom: 1.4rem;
-    padding-bottom: 0.8rem;
+    margin-bottom: 1.3rem;
+    padding-bottom: 0.75rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 .panel-label.blue {
     color: #3b82f6;
-    border-bottom: 1px solid rgba(59,130,246,0.12);
+    border-bottom: 1px solid rgba(59,130,246,0.1);
 }
 .panel-label.blue::before {
     content: '';
     display: inline-block;
-    width: 6px; height: 6px;
+    width: 5px; height: 5px;
     border-radius: 50%;
     background: #3b82f6;
-    box-shadow: 0 0 6px rgba(59,130,246,0.8);
+    box-shadow: 0 0 6px rgba(59,130,246,0.9);
+    flex-shrink: 0;
 }
 .panel-label.emerald {
     color: #10b981;
-    border-bottom: 1px solid rgba(16,185,129,0.12);
+    border-bottom: 1px solid rgba(16,185,129,0.1);
 }
 .panel-label.emerald::before {
     content: '';
     display: inline-block;
-    width: 6px; height: 6px;
+    width: 5px; height: 5px;
     border-radius: 50%;
     background: #10b981;
-    box-shadow: 0 0 6px rgba(16,185,129,0.8);
+    box-shadow: 0 0 6px rgba(16,185,129,0.9);
+    flex-shrink: 0;
 }
 
 /* ── Feedback panel ── */
 .feedback-panel {
-    background: rgba(12,18,32,0.88);
-    border: 1px solid rgba(16,185,129,0.18);
+    background: rgba(11,17,30,0.90);
+    border: 1px solid rgba(16,185,129,0.16);
     border-radius: 18px;
-    padding: 2.2rem 2.5rem;
+    padding: 2rem 2.4rem;
     margin-top: 1rem;
-    animation: fadeSlideUp 0.7s ease-out;
+    animation: fadeSlideUp 0.6s ease-out;
     position: relative;
     overflow: hidden;
 }
@@ -677,95 +652,79 @@ html, body, [class*="css"] {
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 3px;
-    background: linear-gradient(90deg, #10b981, #06b6d4, #10b981);
+    background: linear-gradient(90deg, #10b981, #06b6d4, #10b981, #06b6d4);
     background-size: 200% 100%;
-    animation: gradientFlow 5s ease infinite;
+    animation: topBarFlow 5s linear infinite;
 }
 
 /* ── Download button ── */
 .stDownloadButton > button {
     background: rgba(59,130,246,0.08) !important;
     color: #60a5fa !important;
-    border: 1px solid rgba(59,130,246,0.25) !important;
+    border: 1px solid rgba(59,130,246,0.22) !important;
     font-family: 'Plus Jakarta Sans', sans-serif !important;
     font-weight: 600 !important;
-    font-size: 0.82rem !important;
+    font-size: 0.8rem !important;
     letter-spacing: 0.06em !important;
     border-radius: 10px !important;
-    padding: 0.55rem 1.4rem !important;
+    padding: 0.5rem 1.3rem !important;
     transition: background 0.2s, border-color 0.2s, box-shadow 0.2s !important;
     text-transform: uppercase !important;
 }
 .stDownloadButton > button:hover {
-    background: rgba(59,130,246,0.15) !important;
-    border-color: rgba(59,130,246,0.45) !important;
-    box-shadow: 0 0 16px rgba(59,130,246,0.18) !important;
+    background: rgba(59,130,246,0.14) !important;
+    border-color: rgba(59,130,246,0.42) !important;
+    box-shadow: 0 0 16px rgba(59,130,246,0.15) !important;
 }
 
-/* ── Spinner override ── */
-.stSpinner > div {
-    border-top-color: #3b82f6 !important;
-}
+/* ── Spinner ── */
+.stSpinner > div { border-top-color: #3b82f6 !important; }
 
 /* ── Expander ── */
 details {
-    background: rgba(12,18,32,0.6) !important;
+    background: rgba(11,17,30,0.7) !important;
     border: 1px solid rgba(255,255,255,0.05) !important;
     border-radius: 12px !important;
-    padding: 0.2rem 0.5rem !important;
-    margin-bottom: 0.8rem !important;
+    padding: 0.1rem 0.4rem !important;
+    margin-bottom: 0.7rem !important;
 }
 details summary {
     font-family: 'JetBrains Mono', monospace !important;
-    font-size: 0.72rem !important;
-    color: #475569 !important;
+    font-size: 0.7rem !important;
+    color: #3d5270 !important;
     letter-spacing: 0.12em !important;
     cursor: pointer !important;
-    padding: 0.6rem 0.4rem !important;
+    padding: 0.55rem 0.3rem !important;
     list-style: none !important;
 }
 details summary::-webkit-details-marker { display: none !important; }
-details summary::before {
-    content: '▸ ';
-    color: #3b82f6;
-    opacity: 0.6;
-}
-details[open] summary::before { content: '▾ '; }
+details summary::before { content: '▸  '; color: #3b82f6; opacity: 0.6; }
+details[open] summary::before { content: '▾  '; }
 
 /* ── Warning ── */
 .stAlert {
     background: rgba(59,130,246,0.06) !important;
-    border: 1px solid rgba(59,130,246,0.2) !important;
-    border-radius: 12px !important;
+    border: 1px solid rgba(59,130,246,0.18) !important;
+    border-radius: 10px !important;
     color: #93c5fd !important;
 }
 
 /* ── Footer ── */
 .footer {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem;
-    color: #1e293b;
+    font-size: 0.63rem;
+    color: #1a2535;
     text-align: center;
     margin-top: 4rem;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
 }
-.footer span { color: #2d3d55; }
+.footer span { color: #253447; }
 </style>
 """, unsafe_allow_html=True)
 
-# ── Animated background layer ─────────────────────────────────────────────────
-st.markdown("""
-<div class="bg-layer">
-    <div class="bg-grid"></div>
-    <div class="bg-orb bg-orb-1"></div>
-    <div class="bg-orb bg-orb-2"></div>
-    <div class="bg-orb bg-orb-3"></div>
-</div>
-""", unsafe_allow_html=True)
 
-
-# ── Helper: render a step card with neural connector ──────────────────────────
+# ── Helper: render a step card with neural connector ─────────────────────────
 def step_card(num: str, title: str, state: str, desc: str = "", show_connector: bool = True):
     status_map = {
         "waiting": ("IDLE",      "status-waiting"),
@@ -777,6 +736,7 @@ def step_card(num: str, title: str, state: str, desc: str = "", show_connector: 
 
     st.markdown(f"""
     <div class="step-card {card_cls}">
+        <div class="step-scan"></div>
         <div class="step-header">
             <span class="step-num">{num}</span>
             <span class="step-title">{title}</span>
@@ -802,16 +762,15 @@ for key in ("results", "running", "done"):
         st.session_state[key] = {} if key == "results" else False
 
 
-# ── Hero ──────────────────────────────────────────────────────────────────────
+# ── Hero ─────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="hero">
-    <div class="hero-orbit-ring">
+    <div class="hero-orbit-wrap">
         <div class="orbit-ring-1">
             <div class="orbit-dot"></div>
+            <div class="orbit-dot orbit-dot-v"></div>
         </div>
-        <div class="orbit-ring-2">
-            <div class="orbit-dot orbit-dot-2" style="top:auto;bottom:0;left:50%;"></div>
-        </div>
+        <div class="orbit-ring-2"></div>
     </div>
     <div class="hero-eyebrow">Multi-Agent AI System</div>
     <h1>
@@ -827,7 +786,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# ── Layout: input left, pipeline right ───────────────────────────────────────
+# ── Layout ────────────────────────────────────────────────────────────────────
 col_input, col_spacer, col_pipeline = st.columns([5, 0.5, 4])
 
 with col_input:
@@ -854,7 +813,6 @@ with col_pipeline:
     st.markdown('<div class="section-heading">Pipeline</div>', unsafe_allow_html=True)
 
     r = st.session_state.results
-    done = st.session_state.done
 
     def s(step):
         if not r:
@@ -868,10 +826,10 @@ with col_pipeline:
                     return "running" if k == step else "waiting"
         return "waiting"
 
-    step_card("01", "Search Agent",  s("search"), "Gathers recent web information",      show_connector=True)
-    step_card("02", "Reader Agent",  s("reader"), "Scrapes & extracts deep content",     show_connector=True)
-    step_card("03", "Writer Chain",  s("writer"), "Drafts the full research report",     show_connector=True)
-    step_card("04", "Critic Chain",  s("critic"), "Reviews & scores the report",         show_connector=False)
+    step_card("01", "Search Agent",  s("search"), "Gathers recent web information",  show_connector=True)
+    step_card("02", "Reader Agent",  s("reader"), "Scrapes & extracts deep content", show_connector=True)
+    step_card("03", "Writer Chain",  s("writer"), "Drafts the full research report", show_connector=True)
+    step_card("04", "Critic Chain",  s("critic"), "Reviews & scores the report",     show_connector=False)
 
 
 # ── Run pipeline ──────────────────────────────────────────────────────────────
@@ -888,7 +846,6 @@ if st.session_state.running and not st.session_state.done:
     results = {}
     topic_val = st.session_state.topic_input
 
-    # ── Step 1: Search ──
     with st.spinner("🔍  Search Agent is working…"):
         search_agent = build_search_agent()
         sr = search_agent.invoke({
@@ -898,7 +855,6 @@ if st.session_state.running and not st.session_state.done:
         st.session_state.results = dict(results)
     st.rerun() if False else None
 
-    # ── Step 2: Reader ──
     with st.spinner("📄  Reader Agent is scraping top resources…"):
         reader_agent = build_reader_agent()
         rr = reader_agent.invoke({
@@ -911,7 +867,6 @@ if st.session_state.running and not st.session_state.done:
         results["reader"] = rr["messages"][-1].content
         st.session_state.results = dict(results)
 
-    # ── Step 3: Writer ──
     with st.spinner("✍️  Writer is drafting the report…"):
         research_combined = (
             f"SEARCH RESULTS:\n{results['search']}\n\n"
@@ -923,7 +878,6 @@ if st.session_state.running and not st.session_state.done:
         })
         st.session_state.results = dict(results)
 
-    # ── Step 4: Critic ──
     with st.spinner("🧐  Critic is reviewing the report…"):
         results["critic"] = critic_chain.invoke({
             "report": results["writer"]
@@ -990,6 +944,6 @@ if r:
 st.markdown("""
 <div class="footer">
     ResearchMind &nbsp;<span>·</span>&nbsp; LangChain Multi-Agent Pipeline
-    &nbsp;<span>·</span>&nbsp; Built with Streamlit by Aayush
+    &nbsp;<span>·</span>&nbsp; Built with Streamlit
 </div>
 """, unsafe_allow_html=True)
