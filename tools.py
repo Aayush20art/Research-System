@@ -46,7 +46,6 @@ from langchain.tools import tool
 import requests
 from bs4 import BeautifulSoup
 from tavily import TavilyClient
-from rich import print
 
 tavily = TavilyClient(api_key=os.environ["TAVILY_API_KEY"])
 
