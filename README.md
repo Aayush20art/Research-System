@@ -83,7 +83,7 @@ git clone https://github.com/your-username/research-system.git
 cd research-system
 ```
 
-### 2. Create Virtual Environment
+### 2. Create Virtual Enivironment
 
 ```bash
 python -m venv venv
