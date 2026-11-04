@@ -7,15 +7,11 @@ os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from langchain_core.messages import AIMessage
 from tools import web_search, scrape_url
 
 # Model setup
-llm = ChatGroq(model="openai/gpt-oss-safeguard-20b", temperature=0)
-
-# Helper object to satisfy .content expectations in app.py
-class MessageWrapper:
-    def __init__(self, content):
-        self.content = content
+llm = ChatGroq(model="openai/gpt-oss-20b", temperature=0)
 
 # Custom Functional Agent to bypass LangChain's failing tool-calling factory
 class SimpleFunctionalAgent:
@@ -24,6 +20,7 @@ class SimpleFunctionalAgent:
         
     def invoke(self, inputs):
         messages = inputs.get("messages", [])
+        # Extract the query string from the ("user", "query") tuple passed by app.py
         query = messages[-1][1] if messages else ""
         
         # Directly invoke the Tavily or Scrape tool
@@ -32,7 +29,8 @@ class SimpleFunctionalAgent:
         except Exception as e:
             output = f"Tool execution error: {str(e)}"
             
-        return {"messages": [("assistant", MessageWrapper(str(output)))]}
+        # Return an AIMessage directly so .content works perfectly in app.py
+        return {"messages": [AIMessage(content=str(output))]}
 
 # 1st agent
 def build_search_agent():
