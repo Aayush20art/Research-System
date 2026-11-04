@@ -840,13 +840,16 @@ if st.session_state.running and not st.session_state.done:
         results["search"] = sr["messages"][-1].content
         st.session_state.results = dict(results)
 
-    with st.spinner("📄  Reader Agent is scraping top resources…"):
+with st.spinner("📄  Reader Agent is scraping top resources…"):
         reader_agent = build_reader_agent()
+        
+        # Limit the search snippet slice to prevent passing too many tokens to the agent model
+        trimmed_search = results['search'][:400]
+        
         rr = reader_agent.invoke({
             "messages": [("user",
-                f"Based on the following search results about '{topic_val}', "
-                f"pick the most relevant URL and scrape it for deeper content.\n\n"
-                f"Search Results:\n{results['search'][:800]}"
+                f"Based on this search result: {trimmed_search}, "
+                f"use your tool to scrape the most relevant URL for deep content."
             )]
         })
         results["reader"] = rr["messages"][-1].content
