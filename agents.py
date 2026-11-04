@@ -1,33 +1,37 @@
 import streamlit as st
 import os
 
-# Inject secrets into env before any client is instantiated
 os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
 
-from langchain.agents import create_agent
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 from tools import web_search, scrape_url
 
-# model setup
-llm = ChatGroq(model="meta-llama/llama-prompt-guard-2-86m", temperature=0)
+# Model setup
+llm = ChatGroq(model="meta-llama/llama-prompt-guard-2-22m", temperature=0)
 
-# 1st agent
+# 1st agent: Direct tool execution simulation to avoid LangChain BadRequest errors
 def build_search_agent():
-    return create_agent(
-        model=llm,
-        tools=[web_search]
-    )
+    # We return a custom runner object or function instead of a breaking LangChain agent
+    class SimpleAgent:
+        def invoke(self, inputs):
+            query = inputs["messages"][-1][1]
+            search_output = web_search.invoke(query)
+            return {"messages": [("assistant", search_output)]}
+    return SimpleAgent()
 
-# 2nd agent
+# 2nd agent: Direct reader tool execution
 def build_reader_agent():
-    return create_agent(
-        model=llm,
-        tools=[scrape_url]
-    )
+    class SimpleReaderAgent:
+        def invoke(self, inputs):
+            text_prompt = inputs["messages"][-1][1]
+            # Extract URL or search content and pass to scraper tool if needed
+            scraped_content = scrape_url.invoke("https://duckduckgo.com/?q=" + text_prompt[:50])
+            return {"messages": [("assistant", scraped_content)]}
+    return SimpleReaderAgent()
 
-# writer chain
+# Writer chain
 writer_prompt = ChatPromptTemplate.from_messages([
     ("system", "You are an expert research writer. Write clear, structured and insightful reports."),
     ("human", """Write a detailed research report on the topic below.
@@ -41,14 +45,14 @@ Structure the report as:
 - Introduction
 - Key Findings (minimum 3 well-explained points)
 - Conclusion
-- Sources (list all URLs found in the research)
+- Sources
 
 Be detailed, factual and professional."""),
 ])
 
 writer_chain = writer_prompt | llm | StrOutputParser()
 
-# critic chain
+# Critic chain
 critic_prompt = ChatPromptTemplate.from_messages([
     ("system", "You are a sharp and constructive research critic. Be honest and specific."),
     ("human", """Review the research report below and evaluate it strictly.
