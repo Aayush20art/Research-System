@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 
+# Inject secrets into env before any client is instantiated
 os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
 
 from langchain_groq import ChatGroq
@@ -9,27 +10,37 @@ from langchain_core.output_parsers import StrOutputParser
 from tools import web_search, scrape_url
 
 # Model setup
-llm = ChatGroq(model="meta-llama/llama-prompt-guard-2-22m", temperature=0)
+llm = ChatGroq(model="openai/gpt-oss-safeguard-20b", temperature=0)
 
-# 1st agent: Direct tool execution simulation to avoid LangChain BadRequest errors
+# Helper object to satisfy .content expectations in app.py
+class MessageWrapper:
+    def __init__(self, content):
+        self.content = content
+
+# Custom Functional Agent to bypass LangChain's failing tool-calling factory
+class SimpleFunctionalAgent:
+    def __init__(self, tool_func):
+        self.tool_func = tool_func
+        
+    def invoke(self, inputs):
+        messages = inputs.get("messages", [])
+        query = messages[-1][1] if messages else ""
+        
+        # Directly invoke the Tavily or Scrape tool
+        try:
+            output = self.tool_func.invoke(query) if hasattr(self.tool_func, "invoke") else self.tool_func(query)
+        except Exception as e:
+            output = f"Tool execution error: {str(e)}"
+            
+        return {"messages": [("assistant", MessageWrapper(str(output)))]}
+
+# 1st agent
 def build_search_agent():
-    # We return a custom runner object or function instead of a breaking LangChain agent
-    class SimpleAgent:
-        def invoke(self, inputs):
-            query = inputs["messages"][-1][1]
-            search_output = web_search.invoke(query)
-            return {"messages": [("assistant", search_output)]}
-    return SimpleAgent()
+    return SimpleFunctionalAgent(web_search)
 
-# 2nd agent: Direct reader tool execution
+# 2nd agent
 def build_reader_agent():
-    class SimpleReaderAgent:
-        def invoke(self, inputs):
-            text_prompt = inputs["messages"][-1][1]
-            # Extract URL or search content and pass to scraper tool if needed
-            scraped_content = scrape_url.invoke("https://duckduckgo.com/?q=" + text_prompt[:50])
-            return {"messages": [("assistant", scraped_content)]}
-    return SimpleReaderAgent()
+    return SimpleFunctionalAgent(scrape_url)
 
 # Writer chain
 writer_prompt = ChatPromptTemplate.from_messages([
