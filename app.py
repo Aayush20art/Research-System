@@ -51,8 +51,7 @@ critic_prompt = ChatPromptTemplate.from_messages([
     ("human", "Research Report to Review:\n{report}")
 ])
 critic_chain = critic_prompt | get_groq_llm(temperature=0.2) | StrOutputParser()
-2. Updated app.py (Streamlit Frontend)
-Python
+
 import streamlit as st
 import time
 from agents import build_reader_agent, build_search_agent, writer_chain, critic_chain
