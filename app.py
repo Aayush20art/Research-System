@@ -93,7 +93,7 @@ html, body, [class*="css"] {
     color: #e2e8f0;
 }
 
-/* ── Animated background on stApp directly (no fixed overlay) ── */
+/* ── Animated background on stApp directly ── */
 .stApp {
     background: #060a14 !important;
     background-image:
@@ -104,7 +104,6 @@ html, body, [class*="css"] {
     animation: bgShift 30s ease infinite !important;
 }
 
-/* Grid overlay via a pseudo on the main content wrapper */
 [data-testid="stAppViewContainer"] {
     background: none !important;
 }
@@ -367,7 +366,6 @@ html, body, [class*="css"] {
     animation: emeraldGlow 3.2s ease-in-out infinite;
 }
 
-/* Left accent */
 .step-card::before {
     content: '';
     position: absolute;
@@ -386,7 +384,6 @@ html, body, [class*="css"] {
     box-shadow: 0 0 8px rgba(16,185,129,0.6);
 }
 
-/* Scan sweep on running card */
 .step-card.state-running .step-scan {
     display: block;
     position: absolute;
@@ -677,9 +674,6 @@ html, body, [class*="css"] {
     box-shadow: 0 0 16px rgba(59,130,246,0.15) !important;
 }
 
-/* ── Spinner ── */
-.stSpinner > div { border-top-color: #3b82f6 !important; }
-
 /* ── Expander ── */
 details {
     background: rgba(11,17,30,0.7) !important;
@@ -701,14 +695,6 @@ details summary::-webkit-details-marker { display: none !important; }
 details summary::before { content: '▸  '; color: #3b82f6; opacity: 0.6; }
 details[open] summary::before { content: '▾  '; }
 
-/* ── Warning ── */
-.stAlert {
-    background: rgba(59,130,246,0.06) !important;
-    border: 1px solid rgba(59,130,246,0.18) !important;
-    border-radius: 10px !important;
-    color: #93c5fd !important;
-}
-
 /* ── Footer ── */
 .footer {
     font-family: 'JetBrains Mono', monospace;
@@ -727,7 +713,7 @@ details[open] summary::before { content: '▾  '; }
 # ── Helper: render a step card with neural connector ─────────────────────────
 def step_card(num: str, title: str, state: str, desc: str = "", show_connector: bool = True):
     status_map = {
-        "waiting": ("IDLE",      "status-waiting"),
+        "waiting": ("IDLE",     "status-waiting"),
         "running": ("● RUNNING", "status-running"),
         "done":    ("✓ DONE",    "status-done"),
     }
@@ -853,7 +839,6 @@ if st.session_state.running and not st.session_state.done:
         })
         results["search"] = sr["messages"][-1].content
         st.session_state.results = dict(results)
-    st.rerun() if False else None
 
     with st.spinner("📄  Reader Agent is scraping top resources…"):
         reader_agent = build_reader_agent()
