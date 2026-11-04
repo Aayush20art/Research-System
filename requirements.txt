@@ -2,6 +2,7 @@ langchain
 langchain-core
 langchain-community
 langchain-groq
+duckduckgo-search
 tavily-python
 beautifulsoup4
 requests
